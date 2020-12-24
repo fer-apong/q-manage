@@ -64,7 +64,6 @@ export default {
     }
   },
   mounted() {
-    console.log(this.navData)
   },
 }
 </script>
@@ -77,5 +76,9 @@ export default {
 }
 .q-card__section--vert {
   padding: 0;
+}
+.q-item.q-router-link--active,
+.q-item--active {
+  border-right: 3px solid var(--q-color-primary);
 }
 </style>

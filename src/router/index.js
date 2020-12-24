@@ -20,7 +20,14 @@ export default function (/* { store, ssrContext } */) {
     routes: [
       {
         path: '/',
+        name: '首页',
         component: () => import('layouts/MainLayout.vue'),
+        meta: {
+          title: '首页',
+          icon: 'mdi-home',
+          role: [],
+        },
+        redirect: { name: '系统看板' },
         children: routes
       },
       {

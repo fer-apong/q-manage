@@ -1,12 +1,12 @@
 <template>
   <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
+    <q-header>
       <q-toolbar>
         <q-btn
           flat
           dense
           round
-          icon="mdi-menu"
+          icon="mdi-page-layout-sidebar-left"
           aria-label="Menu"
           @click="leftDrawerOpen = !leftDrawerOpen"
         />
@@ -39,8 +39,8 @@
 
     <q-page-container>
       <q-page padding>
-        <router-view>
-        </router-view>
+        <Breadcrumbs />
+        <router-view />
       </q-page>
     </q-page-container>
   </q-layout>
@@ -48,11 +48,15 @@
 
 <script>
 import NavBar from 'components/common/NavBar/NavBar.vue'
+import Breadcrumbs from 'components/common/Breadcrumbs/Breadcrumbs.vue'
 import routes from 'router/routes.js'
 
 export default {
   name: 'MainLayout',
-  components: { NavBar },
+  components: { 
+    NavBar,
+    Breadcrumbs
+  },
   data () {
     return {
       leftDrawerOpen: true,
@@ -62,4 +66,15 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.q-header {
+  background: #fff;
+  color: var(--q-color-primary);
+}
+.q-toolbar {
+  height: 70px;
+}
+</style>
+
 
