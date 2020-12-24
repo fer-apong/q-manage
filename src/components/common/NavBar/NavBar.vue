@@ -1,31 +1,30 @@
 <template>
   <div>
-    <div
-      v-for="navItem in navData"
-      :key="navItem.index"
-    >
+    <template v-for="(navItem, index) in navData">
       <q-expansion-item
-        group="nav"
+        :key="index"
+        :group="group"
         v-if="navItem.children"
         expand-separator
         expand-icon="mdi-chevron-down"
         :icon="navItem.meta.icon"
         :label="navItem.meta.title"
+        :header-inset-level="indent"
       >
-        <q-card>
-          <q-card-section>
-            <nav-bar
-              v-if="navItem.children.length>0"
-              :navData="navItem.children"
-            ></nav-bar>
-          </q-card-section>
-        </q-card>
+        <nav-bar
+          v-if="navItem.children.length>0"
+          :navData="navItem.children"
+          :indent="indent + 0.8"
+          :group="group + 1"
+        ></nav-bar>
       </q-expansion-item>
       <q-item
+        :key="index"
         v-else
         clickable
         tag="a"
         :to="navItem.path"
+        :inset-level="indent"
       >
         <q-item-section
           v-if="navItem.meta.icon"
@@ -37,7 +36,7 @@
           <q-item-label>{{ navItem.meta.title }}</q-item-label>
         </q-item-section>
       </q-item>
-    </div>
+    </template>
   </div>
 </template>
 
@@ -53,6 +52,16 @@ export default {
       default() {
         return []
       }
+    },
+    indent: {
+      type: Number,
+      require: false,
+      default: 0
+    },
+    group: {
+      type: String,
+      require: false,
+      default: '1'
     }
   },
   components: {
@@ -60,7 +69,6 @@ export default {
   },
   data () {
     return {
-
     }
   },
   mounted() {
@@ -68,7 +76,7 @@ export default {
 }
 </script>
 <style scoped>
-.q-item {
+/* .q-item {
   min-height: 0;
 }
 .q-item__label {
@@ -76,7 +84,7 @@ export default {
 }
 .q-card__section--vert {
   padding: 0;
-}
+} */
 .q-item.q-router-link--active,
 .q-item--active {
   border-right: 3px solid var(--q-color-primary);

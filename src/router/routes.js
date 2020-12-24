@@ -68,8 +68,30 @@ const routes = [
       {
         path: '/Products/AddProduct',
         name: '添加产品',
-        component: () => import('pages/Products/AddProduct'),
-        meta: { title: '添加产品', role: [] }
+        component: () => import('layouts/RouteView.vue'),
+        meta: { title: '添加产品', role: [] },
+        children: [
+          {
+            path: '/Articles/Category',
+            name: '文章分类管理1',
+            component: () => import('pages/Articles/Category'),
+            meta: {
+              title: '文章分类管理', role: []
+            }
+          },
+          {
+            path: '/Articles/Articles',
+            name: '所有文章1',
+            component: () => import('pages/Articles/Articles'),
+            meta: { title: '所有文章', role: [] }
+          },
+          {
+            path: '/Articles/AddArticle',
+            name: '添加文章1',
+            component: () => import('pages/Articles/AddArticle'),
+            meta: { title: '添加文章', role: [] }
+          }
+        ]
       }
     ]
   }
