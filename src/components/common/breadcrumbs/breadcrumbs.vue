@@ -1,5 +1,5 @@
 <template>
-  <q-breadcrumbs class="q-pb-md q-pr-md q-pl-md">
+  <q-breadcrumbs class="q-pb-md q-pr-md">
     <q-breadcrumbs-el
       v-for="breadcrumb in breadcrumbsData"
       :icon="breadcrumb.meta.icon"

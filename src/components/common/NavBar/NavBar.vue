@@ -14,7 +14,7 @@
         <nav-bar
           v-if="navItem.children.length>0"
           :navData="navItem.children"
-          :indent="indent + 0.8"
+          :indent="indent + 0.5"
           :group="group + 1"
         ></nav-bar>
       </q-expansion-item>
@@ -76,15 +76,6 @@ export default {
 }
 </script>
 <style scoped>
-/* .q-item {
-  min-height: 0;
-}
-.q-item__label {
-  line-height: normal !important;
-}
-.q-card__section--vert {
-  padding: 0;
-} */
 .q-item.q-router-link--active,
 .q-item--active {
   border-right: 3px solid var(--q-color-primary);

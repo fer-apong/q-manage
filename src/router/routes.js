@@ -68,30 +68,39 @@ const routes = [
       {
         path: '/Products/AddProduct',
         name: '添加产品',
-        component: () => import('layouts/RouteView.vue'),
-        meta: { title: '添加产品', role: [] },
-        children: [
-          {
-            path: '/Articles/Category',
-            name: '文章分类管理1',
-            component: () => import('pages/Articles/Category'),
-            meta: {
-              title: '文章分类管理', role: []
-            }
-          },
-          {
-            path: '/Articles/Articles',
-            name: '所有文章1',
-            component: () => import('pages/Articles/Articles'),
-            meta: { title: '所有文章', role: [] }
-          },
-          {
-            path: '/Articles/AddArticle',
-            name: '添加文章1',
-            component: () => import('pages/Articles/AddArticle'),
-            meta: { title: '添加文章', role: [] }
-          }
-        ]
+        component: () => import('pages/Products/AddProduct'),
+        meta: { title: '添加产品', role: [] }
+      }
+    ]
+  },
+  {
+    path: '/Plans',
+    name: '工作计划管理',
+    component: () => import('layouts/RouteView.vue'),
+    meta: {
+      title: '工作计划管理',
+      icon: 'mdi-calendar-clock',
+      role: [],
+    },
+    children: [
+
+      {
+        path: '/Plans/CheckPending',
+        name: '待审核工作计划',
+        component: () => import('pages/Plans/CheckPending'),
+        meta: { title: '待审核工作计划', role: [] }
+      },
+      {
+        path: '/Plans/Plans',
+        name: '所有工作计划',
+        component: () => import('pages/Plans/Plans'),
+        meta: { title: '所有工作计划', role: [] }
+      },
+      {
+        path: '/Plans/Plan',
+        name: '创建新计划',
+        component: () => import('pages/Plans/Plan'),
+        meta: { title: '创建新计划', role: [] }
       }
     ]
   }
