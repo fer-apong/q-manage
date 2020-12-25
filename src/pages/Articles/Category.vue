@@ -8,13 +8,36 @@
     <!-- 主要内容 -->
     <q-card-section>
       <q-table
-        title="Treats"
+        title="测试用表格"
         :data="data"
         :columns="columns"
         row-key="name"
         flat
         bordered
-      />
+        :pagination="initialPagination"
+        rows-per-page-label="每页显示"
+      >
+        <template v-slot:top-right>
+          <q-btn-group flat>
+            <q-btn
+              color="primary"
+              icon="timeline"
+              label="导出"
+            />
+            <q-btn
+              color="primary"
+              icon="visibility"
+              label="删除"
+            />
+            <q-btn
+              color="primary"
+              icon="update"
+              label="添加"
+            />
+          </q-btn-group>
+          <q-space />
+        </template>
+      </q-table>
     </q-card-section>
   </q-card>
 </template>
@@ -30,6 +53,12 @@ export default {
   props: {},
   data () {
     return {
+      initialPagination: {
+        sortBy: 'desc',
+        descending: false,
+        rowsPerPage: 8
+        // rowsNumber: xx if getting data from a server
+      },
       columns: [
         {
           name: 'name',
