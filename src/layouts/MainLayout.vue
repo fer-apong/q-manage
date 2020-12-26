@@ -1,6 +1,6 @@
 <template>
   <q-layout view="lHh Lpr lFf">
-    <q-header class="bg-grey-1 text-primary">
+    <q-header class="bg-grey-1 text-dui">
       <HeaderToolbar />
     </q-header>
 

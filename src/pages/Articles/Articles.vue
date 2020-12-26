@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import { getArticleApi } from 'network/request'
+import { $$Api } from 'network/request'
 export default {
   name: 'PageArticles',
   components: {},
@@ -51,7 +51,7 @@ export default {
         pageIndex: 1,
         pageSize: 3
       }
-      getArticleApi ('NewsListHanlder.ashx', data).then (result => {
+      $$Api ('NewsList/NewsListHanlder.ashx', data).then (result => {
         console.log(result)
       }).catch (err => {
         console.log(err)

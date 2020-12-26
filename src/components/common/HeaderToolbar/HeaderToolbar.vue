@@ -3,7 +3,6 @@
     <q-btn
       flat
       dense
-      round
       icon="mdi-view-headline"
       aria-label="Menu"
       @click="leftDrawerOpen = !leftDrawerOpen"

@@ -1,195 +1,134 @@
 <template>
-  <q-card flat>
-    <q-card-section>
-      <CurrentTitle class="text-h6" />
-      <p class="text-grey-6">页面示例的为：简单表格的弹出层编辑内容。</p>
-    </q-card-section>
-    <q-separator inset />
-    <!-- 主要内容 -->
-    <q-card-section>
-      <q-table
-        title="测试用表格"
-        :data="data"
-        :columns="columns"
-        row-key="name"
-        flat
-        bordered
-        :pagination="initialPagination"
-        rows-per-page-label="每页显示"
-      >
-        <template v-slot:top-right>
-          <q-btn-group flat>
+  <q-card-section>
+    <p class="text-grey-6">页面示例的为：简单表格的弹出层编辑内容。</p>
+    <q-table
+      :data="tableContentData"
+      :columns="columns"
+      :visibleColumns="visibleColumns"
+      row-key="index"
+      flat
+      bordered
+      :pagination="initialPagination"
+      rows-per-page-label="每页显示"
+      :separator="separator"
+    >
+      <template v-slot:top>
+        <div class="col-2">
+          <q-select
+            outlined
+            dense
+            v-model="model"
+            :options="options"
+            label="一级分类"
+            clear-icon="mdi-close"
+            clearable
+          />
+        </div>
+        <q-space class="col" />
+        <div class="col-4">
+          <q-btn-group
+            flat
+            class="float-right"
+          >
             <q-btn
               color="primary"
-              icon="timeline"
+              icon="mdi-file-export"
               label="导出"
+              size="md"
             />
             <q-btn
               color="primary"
-              icon="visibility"
+              icon="mdi-delete"
               label="删除"
+              size="md"
             />
             <q-btn
               color="primary"
-              icon="update"
+              icon="mdi-table-row-plus-after"
               label="添加"
+              size="md"
             />
           </q-btn-group>
-          <q-space />
-        </template>
-      </q-table>
-    </q-card-section>
-  </q-card>
+        </div>
+      </template>
+      <template v-slot:body-cell-Action="props">
+        <q-td :props="props">
+          <q-btn-group flat>
+            <q-btn
+              icon="mdi-delete"
+              label="删除"
+              size="sm"
+            />
+            <q-btn
+              icon="mdi-table-edit"
+              label="编辑"
+              size="sm"
+            />
+          </q-btn-group>
+        </q-td>
+      </template>
+    </q-table>
+  </q-card-section>
 </template>
 
 <script>
-import CurrentTitle from 'components/common/CurrentTitle/CurrentTitle'
-import { getArticleCategoryApi } from 'network/request'
+import { $$Api } from 'network/request'
 
 export default {
   components: {
-    CurrentTitle
   },
   props: {},
   data () {
     return {
+      model: null,
+      options: [
+        '资讯', '深度'
+      ],
       initialPagination: {
         sortBy: 'desc',
         descending: false,
-        rowsPerPage: 8
+        rowsPerPage: 20
         // rowsNumber: xx if getting data from a server
       },
+      // 分割线模式可选值：horizontal (default)', 'vertical', 'cell', 'none'
+      separator: 'horizontal',
+      visibleColumns: ['ParentName', 'ColumnName', 'QuickExplain', 'Action'],
       columns: [
         {
-          name: 'name',
+          name: 'index',
           required: true,
-          label: 'Dessert (100g serving)',
-          align: 'left',
-          field: row => row.name,
-          format: val => `${val}`,
-          sortable: true
+          label: '序号',
+          align: 'center',
+          field: 'index'
         },
-        { name: 'calories', align: 'center', label: 'Calories', field: 'calories', sortable: true },
-        { name: 'fat', label: 'Fat (g)', field: 'fat', sortable: true },
-        { name: 'carbs', label: 'Carbs (g)', field: 'carbs' },
-        { name: 'protein', label: 'Protein (g)', field: 'protein' },
-        { name: 'sodium', label: 'Sodium (mg)', field: 'sodium' },
-        { name: 'calcium', label: 'Calcium (%)', field: 'calcium', sortable: true, sort: (a, b) => parseInt(a, 10) - parseInt(b, 10) },
-        { name: 'iron', label: 'Iron (%)', field: 'iron', sortable: true, sort: (a, b) => parseInt(a, 10) - parseInt(b, 10) }
+        { name: 'ParentName', align: 'left', label: '一级分类', field: 'ParentName', sortable: true },
+        { name: 'ColumnName', align: 'left', label: '二级分类', field: 'ColumnName', sortable: true },
+        { name: 'QuickExplain', align: 'left', label: '快速描述', field: 'QuickExplain' },
+        { name: 'Action', align: 'center', label: '操作', field: '', style: 'width:300px' },
+        { name: 'ID', align: 'left', label: 'ID', field: 'ID' },
+        { name: 'UpLevelID', align: 'left', label: 'UpLevelID', field: 'UpLevelID' },
       ],
-      data: [
-        {
-          name: 'Frozen Yogurt',
-          calories: 159,
-          fat: 6.0,
-          carbs: 24,
-          protein: 4.0,
-          sodium: 87,
-          calcium: '14%',
-          iron: '1%'
-        },
-        {
-          name: 'Ice cream sandwich',
-          calories: 237,
-          fat: 9.0,
-          carbs: 37,
-          protein: 4.3,
-          sodium: 129,
-          calcium: '8%',
-          iron: '1%'
-        },
-        {
-          name: 'Eclair',
-          calories: 262,
-          fat: 16.0,
-          carbs: 23,
-          protein: 6.0,
-          sodium: 337,
-          calcium: '6%',
-          iron: '7%'
-        },
-        {
-          name: 'Cupcake',
-          calories: 305,
-          fat: 3.7,
-          carbs: 67,
-          protein: 4.3,
-          sodium: 413,
-          calcium: '3%',
-          iron: '8%'
-        },
-        {
-          name: 'Gingerbread',
-          calories: 356,
-          fat: 16.0,
-          carbs: 49,
-          protein: 3.9,
-          sodium: 327,
-          calcium: '7%',
-          iron: '16%'
-        },
-        {
-          name: 'Jelly bean',
-          calories: 375,
-          fat: 0.0,
-          carbs: 94,
-          protein: 0.0,
-          sodium: 50,
-          calcium: '0%',
-          iron: '0%'
-        },
-        {
-          name: 'Lollipop',
-          calories: 392,
-          fat: 0.2,
-          carbs: 98,
-          protein: 0,
-          sodium: 38,
-          calcium: '0%',
-          iron: '2%'
-        },
-        {
-          name: 'Honeycomb',
-          calories: 408,
-          fat: 3.2,
-          carbs: 87,
-          protein: 6.5,
-          sodium: 562,
-          calcium: '0%',
-          iron: '45%'
-        },
-        {
-          name: 'Donut',
-          calories: 452,
-          fat: 25.0,
-          carbs: 51,
-          protein: 4.9,
-          sodium: 326,
-          calcium: '2%',
-          iron: '22%'
-        },
-        {
-          name: 'KitKat',
-          calories: 518,
-          fat: 26.0,
-          carbs: 65,
-          protein: 7,
-          sodium: 54,
-          calcium: '12%',
-          iron: '6%'
-        }
-      ]
+      tableContentData: []
     }
   },
   methods: {
     getArticleCategory() {
-      this.getArticleCategoryApi('GetColumnHandler.ashx').then (result => {
+      $$Api('ColumnList/GetColumnHandler.ashx').then (result => {
+        this.tableContentData = result
+        // 生成序号
+        this.tableContentData.forEach((row, index) => {
+          row.index = index + 1
+          // console.log(row.index)
+        })
         console.log(result)
       }).catch (err => {
         console.log(err)
       })
     }
-  }
+  },
+  mounted() {
+    this.getArticleCategory()
+  },
 }
 </script>
 <style scoped>

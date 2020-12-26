@@ -1,5 +1,5 @@
 <template>
-  <div class="text-subtitle1 text-grey-8">{{CurrentTitle}}</div>
+  <div class="text-subtitle1 text-primary">{{CurrentTitle}}</div>
 </template>
 
 <script>
@@ -19,6 +19,11 @@ export default {
   mounted() {
     this.getCurrentTitle()
   },
+  watch: {
+    $route(to, from) {
+      this.getCurrentTitle();
+    }
+  }
 }
 </script>
 <style scoped>

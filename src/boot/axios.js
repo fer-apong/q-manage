@@ -8,7 +8,7 @@ Vue.prototype.$axios = axios
 export function requestApi (config) {
   // 创建实例
   const api = axios.create({
-    baseURL: 'http://192.168.10.142:4391/',
+    baseURL: 'http://192.168.10.142:4391/HandlerForVUE/',
     timeout: 5000,
     headers: { 'content-type': 'application/x-www-form-urlencoded' }
   })
