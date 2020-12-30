@@ -6,6 +6,7 @@
       :columns="columns"
       :visibleColumns="visibleColumns"
       row-key="index"
+      :loading="loading"
       flat
       bordered
       :pagination="initialPagination"
@@ -17,11 +18,12 @@
           <q-select
             outlined
             dense
-            v-model="model"
-            :options="options"
+            v-model="form.model"
+            :options="form.options"
             label="一级分类"
             clear-icon="mdi-close"
             clearable
+            @input="getCategory(form.model, defaultPageIndex)"
           />
         </div>
         <q-space class="col" />
@@ -47,6 +49,7 @@
               icon="mdi-table-row-plus-after"
               label="添加"
               size="md"
+              @click="qDialog.addRow = true"
             />
           </q-btn-group>
         </div>
@@ -58,6 +61,7 @@
               icon="mdi-delete"
               label="删除"
               size="sm"
+              @click="getDeleteRow(props.row)"
             />
             <q-btn
               icon="mdi-table-edit"
@@ -67,7 +71,107 @@
           </q-btn-group>
         </q-td>
       </template>
+      <template v-slot:pagination="scope">
+        <q-pagination
+          v-model="initialPagination.current"
+          :max="initialPagination.page"
+          :boundary-links="true"
+          @click="getCategory(model, initialPagination.current)"
+        >
+        </q-pagination>
+      </template>
+      <template v-slot:loading>
+        <q-inner-loading
+          showing
+          color="primary"
+        />
+      </template>
     </q-table>
+    <!-- 对话框-删除确认 -->
+    <q-dialog v-model="qDialog.delConfirm">
+      <q-card>
+        <q-card-section class="row items-center">
+          <q-avatar
+            icon="mdi-alert-circle-outline"
+            text-color="primary"
+          />
+          <span class="q-ml-sm">确定要删除这条记录吗？</span>
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn
+            flat
+            label="取消"
+            color="primary"
+            v-close-popup
+          />
+          <q-btn
+            flat
+            label="确定删除"
+            color="primary"
+            v-close-popup
+            @click="deleteRow(deleteID)"
+          />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+    <!-- 对话框-添加 -->
+    <q-dialog
+      v-model="qDialog.addRow"
+      persistent
+    >
+      <q-card style="width:400px">
+        <q-card-section>
+          <div class="q-pb-md text-h6">添加新分类</div>
+          <q-separator />
+        </q-card-section>
+        <q-card-section class="row items-center">
+          <q-form
+            action=""
+            @addRow="addRow"
+            class="q-gutter-y-md full-width"
+          >
+            <q-select
+              outlined
+              dense
+              v-model="form.model"
+              :options="form.options"
+              label="一级分类"
+              name="UpLevelID"
+            />
+            <q-input
+              outlined
+              v-model="form.columnName"
+              label="请输入分类名称"
+              name="ColumnName"
+            />
+            <q-input
+              outlined
+              v-model="form.quickExplain"
+              label="请输入快速介绍"
+              name="QuickExplain"
+              :rules="[ val => val.length <= 10 || '最多输入10个字']"
+            />
+            <q-separator />
+            <q-card-actions align="right">
+              <q-btn
+                flat
+                label="取消"
+                color="primary"
+                v-close-popup
+              />
+              <q-btn
+                flat
+                label="添加"
+                color="primary"
+                v-close-popup
+                type="addRow"
+              />
+            </q-card-actions>
+
+          </q-form>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </q-card-section>
 </template>
 
@@ -80,18 +184,31 @@ export default {
   props: {},
   data () {
     return {
-      model: null,
-      options: [
-        '资讯', '深度'
-      ],
+      // ---------- 下拉框
+      form: {
+        model: null,
+        options: [],
+        columnName: '',
+        quickExplain: '',
+        submitURL: ''
+      },
+      // ---------- 表格
+      // 默认$$Api参数
+      defaultUpCategory: -1,
+      defaultPageIndex: 1,
+      // 初始化分页
       initialPagination: {
         sortBy: 'desc',
         descending: false,
-        rowsPerPage: 20
+        page: 1,
+        rowsPerPage: 10,
+        current: 1
         // rowsNumber: xx if getting data from a server
       },
       // 分割线模式可选值：horizontal (default)', 'vertical', 'cell', 'none'
       separator: 'horizontal',
+      loading: true,
+      // 可见列
       visibleColumns: ['ParentName', 'ColumnName', 'QuickExplain', 'Action'],
       columns: [
         {
@@ -108,28 +225,79 @@ export default {
         { name: 'ID', align: 'left', label: 'ID', field: 'ID' },
         { name: 'UpLevelID', align: 'left', label: 'UpLevelID', field: 'UpLevelID' },
       ],
-      tableContentData: []
+      tableContentData: [],
+      // ---------- 对话框
+      qDialog: {
+        delConfirm: false,
+        addRow: false,
+      },
+      deleteID: 0,
+      addRowResult: []
     }
   },
   methods: {
-    getArticleCategory() {
-      $$Api('ColumnList/GetColumnHandler.ashx').then (result => {
-        this.tableContentData = result
+    getCategory(modelValue, currentPage) {
+      const params = {
+        pageIndex:currentPage,
+        pageSize:10,
+        upColumnID:-1
+      }
+      if (modelValue !== null) {
+        params.upColumnID = modelValue.value
+      }
+      $$Api('ColumnList/GetColumnHandler.ashx', params).then (result => {
+        this.tableContentData = result.data
+        this.initialPagination.page = Math.ceil(result.count / this.initialPagination.rowsPerPage)
+        console.log(this.initialPagination.page)
         // 生成序号
         this.tableContentData.forEach((row, index) => {
           row.index = index + 1
-          // console.log(row.index)
         })
-        console.log(result)
+        // 关闭加载动画
+        this.loading = false
+        console.log(this.tableContentData)
       }).catch (err => {
         console.log(err)
       })
+    },
+    getUpCategory() {
+      $$Api('ColumnList/GetUpColumnForNews.ashx').then (result => {
+        this.form.options = result
+      }).catch (err => {
+        console.log(err)
+      })
+    },
+    getDeleteRow(value) {
+      this.deleteID = value.ID
+      this.qDialog.delConfirm = true
+    },
+    deleteRow(rowid) {
+      // 删除脚本
+      console.log(rowid)
+    },
+    addRow(evt) {
+      const formData = new FormData(evt.target)
+      const addRowResult = []
+
+      for (const [ name, value ] of formData.entries()) {
+        addRowResult.push({
+          name,
+          value
+        })
+      }
+
+      this.addRowResult = addRowResult
+      console.log(addRowResult)
     }
   },
   mounted() {
-    this.getArticleCategory()
+    this.getCategory(this.form.model, this.defaultPageIndex)
+    this.getUpCategory()
   },
 }
 </script>
-<style scoped>
+<style>
+.q-pagination .q-btn__wrapper:before {
+  box-shadow: none;
+}
 </style>
