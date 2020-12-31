@@ -21,6 +21,7 @@ export default function (/* { ssrContext } */) {
     modules: {
       // example
     },
+    state,
 
     // enable strict mode (adds overhead!)
     // for dev mode only

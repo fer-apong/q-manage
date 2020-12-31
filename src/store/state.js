@@ -1,5 +1,8 @@
 const state = {
-  baseURL: 'http://192.168.10.142:4391/HandlerForVUE/',
+  default: {
+    // 默认分页，每页条数
+    page: 3
+  },
   role: '',
   routes: [],
   breadcrumbs: [],

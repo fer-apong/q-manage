@@ -80,6 +80,7 @@ module.exports = function (/* ctx */) {
           // 'statics': path.resolve(__dirname, './src/statics'),
           'network': path.resolve(__dirname, './src/network'),
           'router': path.resolve(__dirname, './src/router'),
+          'store': path.resolve(__dirname, './src/store'),
         }
       }
     },

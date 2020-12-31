@@ -71,12 +71,12 @@
           </q-btn-group>
         </q-td>
       </template>
-      <template v-slot:pagination="scope">
+      <template v-slot:pagination>
         <q-pagination
           v-model="initialPagination.current"
           :max="initialPagination.page"
           :boundary-links="true"
-          @click="getCategory(model, initialPagination.current)"
+          @click="getCategory(form.model, initialPagination.current)"
         >
         </q-pagination>
       </template>
@@ -126,9 +126,10 @@
         </q-card-section>
         <q-card-section class="row items-center">
           <q-form
-            action=""
-            @addRow="addRow"
+            action="http://192.168.10.142:4391/ColumnList/AddColumnHandler.ashx"
+            method="post"
             class="q-gutter-y-md full-width"
+            @submit.prevent="addRow"
           >
             <q-select
               outlined
@@ -136,19 +137,19 @@
               v-model="form.model"
               :options="form.options"
               label="一级分类"
-              name="UpLevelID"
+              name="Upid"
             />
             <q-input
               outlined
               v-model="form.columnName"
               label="请输入分类名称"
-              name="ColumnName"
+              name="Name"
             />
             <q-input
               outlined
               v-model="form.quickExplain"
               label="请输入快速介绍"
-              name="QuickExplain"
+              name="Quick"
               :rules="[ val => val.length <= 10 || '最多输入10个字']"
             />
             <q-separator />
@@ -164,7 +165,7 @@
                 label="添加"
                 color="primary"
                 v-close-popup
-                type="addRow"
+                type="submit"
               />
             </q-card-actions>
 
@@ -201,7 +202,7 @@ export default {
         sortBy: 'desc',
         descending: false,
         page: 1,
-        rowsPerPage: 10,
+        rowsPerPage: this.$store.state.default.page,
         current: 1
         // rowsNumber: xx if getting data from a server
       },
@@ -239,8 +240,8 @@ export default {
     getCategory(modelValue, currentPage) {
       const params = {
         pageIndex:currentPage,
-        pageSize:10,
-        upColumnID:-1
+        pageSize:this.initialPagination.rowsPerPage,
+        upColumnID:this.defaultUpCategory
       }
       if (modelValue !== null) {
         params.upColumnID = modelValue.value
@@ -277,17 +278,19 @@ export default {
     },
     addRow(evt) {
       const formData = new FormData(evt.target)
-      const addRowResult = []
+      console.log(formData)
+      const newRowResult = []
 
       for (const [ name, value ] of formData.entries()) {
-        addRowResult.push({
+        newRowResult.push({
           name,
           value
         })
       }
 
-      this.addRowResult = addRowResult
-      console.log(addRowResult)
+      this.addRowResult = newRowResult
+      console.log(this.addRowResult)
+      // evt.target.submit()
     }
   },
   mounted() {
