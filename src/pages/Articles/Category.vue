@@ -77,7 +77,7 @@
           </q-btn-group>
         </q-td>
       </template>
-      <template v-slot:pagination="scope">
+      <template v-slot:pagination>
         <q-pagination
           v-model="table.initialPagination.current"
           :max="table.initialPagination.page"
@@ -124,6 +124,7 @@
     <q-dialog
       v-model="dialog.editConfirm"
       persistent
+      @input="clearDialogForm"
     >
       <q-card style="width:400px">
         <q-card-section>
@@ -140,7 +141,6 @@
               dense
               v-model="dialog.form.model"
               :options="dialog.form.options"
-              :display-value="dialog.form.parentName"
               label="一级分类"
               name="Upid"
             />
@@ -194,6 +194,7 @@
     <q-dialog
       v-model="dialog.addRow"
       persistent
+      @input="clearDialogForm"
     >
       <q-card style="width:400px">
         <q-card-section>
@@ -255,7 +256,6 @@
 
 <script>
 import { $$Api } from 'network/request'
-
 export default {
   components: {
   },
@@ -314,7 +314,11 @@ export default {
         editData:{},
         addRow: false,
         form: {
-          model: null,
+          model: {
+            icon: '',
+            label: '选择分类',
+            value: -1
+          },
           options: [],
           parentName: '',
           id: '',
@@ -354,13 +358,11 @@ export default {
     // 动态分页(下拉选择每页显示条数)
     requestCategory(props) {
       const { rowsNumber, rowsPerPage } = props.pagination
-
       if ( rowsPerPage === 0 ) {
         this.table.initialPagination.rowsPerPage = rowsNumber
       } else {
         this.table.initialPagination.rowsPerPage = rowsPerPage
       }
-
       this.table.initialPagination.current = 1
       this.getCategory(this.form.model, this.table.initialPagination.current)
     },
@@ -385,11 +387,7 @@ export default {
       if (this.table.selected.length > 0) {
         this.dialog.delConfirm = true
       } else {
-        this.$q.notify({
-          message: '请选择要删除的记录',
-          position: 'center',
-          color: 'red-10'
-        })
+        this.$utils.notify('请选择要删除的记录','red-8')
       }
     },
     // 获取单条删除的row信息
@@ -408,11 +406,7 @@ export default {
           //  重新请求数据列表
            this.getCategory(this.form.model, this.table.defaultPageIndex)
          } else if ( result === 'Database Error' ) {
-           this.$q.notify({
-            message: '数据库操作错误，请联系管理员',
-            position: 'center',
-            color: 'red-10'
-          })
+           this.$utils.notify('数据库操作错误，请联系管理员', 'red-8')
          }
       }).catch (err => {
         console.log(err)
@@ -431,36 +425,27 @@ export default {
     // 获得编辑的行数据
     getEditRow(value) {
       this.dialog.editConfirm = true
-      this.dialog.form.model = value.UpLevelID
+      this.dialog.form.model.label = value.ParentName
+      this.dialog.form.model.value = value.UpLevelID
       this.dialog.form.columnName = value.ColumnName
       this.dialog.form.quickExplain = value.QuickExplain
-      this.dialog.form.parentName = value.ParentName
       this.dialog.form.id = value.ID
-
     },
     // 提交编辑数据
     editRow (evt) {
-      const formData = new FormData(evt.target)
-      const newRowResult = []
-
-      this.editRowResult = this.$utils.formatFormData(formData, newRowResult)
+      this.editRowResult = this.$utils.formatFormData(evt)
+      console.log(this.editRowResult)
       
       $$Api('ColumnList/UpdateColumnHandler.ashx', this.editRowResult).then (result => {
          if ( result === 'success') {
+          this.clearDialogForm()
+          this.$utils.notify('数据修改成功！', 'positive')
           //  重新请求数据列表
            this.getCategory(this.form.model, this.table.defaultPageIndex)
          } else if ( result === 'error' ) {
-           this.$q.notify({
-            message: '数据库操作错误，请联系管理员',
-            position: 'center',
-            color: 'red-10'
-          })
+           this.$utils.notify('数据库操作错误，请联系管理员', 'red-8')
          } else if ( result === 'exist' ) {
-           this.$q.notify({
-            message: '该分类已存在，请更换分类名称',
-            position: 'center',
-            color: 'red-10'
-          })
+           this.$utils.notify('该分类已存在，请更换分类名称', 'red-10')
          }
       }).catch (err => {
         console.log(err)
@@ -470,34 +455,30 @@ export default {
     addRow(evt) {
       const formData = new FormData(evt.target)
       const newRowResult = []
-
       this.addRowResult = this.$utils.formatFormData(formData, newRowResult)
       console.log(this.addRowResult)
       
       $$Api('ColumnList/AddColumnHandler.ashx', this.addRowResult).then (result => {
         if ( result === 'success') {
+          this.clearDialogForm()
         //  重新请求数据列表
           this.getCategory(this.form.model, this.table.defaultPageIndex)
         } else if ( result === 'error' ) {
-          this.$q.notify({
-          message: '数据库操作错误，请联系管理员',
-          position: 'center',
-          color: 'red-10'
-        })
+          this.$utils.notify('数据库操作错误，请联系管理员', 'red-8')
         } else if ( result === 'exist' ) {
-          this.$q.notify({
-          message: '该分类已存在，请更换分类名称',
-          position: 'center',
-          color: 'red-10'
-        })
+          this.$utils.notify('该分类已存在，请更换分类名称', 'red-10')
         }
-
-        this.dialog.form.model = null
-        this.dialog.form.columnName = ''
-        this.dialog.form.quickExplain = ''
       }).catch (err => {
         console.log(err)
       })
+    },
+    clearDialogForm() {
+        this.dialog.form.model.icon = ''
+        this.dialog.form.model.label = '选择分类'
+        this.dialog.form.model.value = -1
+        this.dialog.form.columnName = ''
+        this.dialog.form.quickExplain = ''
+        this.getUpCategory()
     }
   },
   mounted() {

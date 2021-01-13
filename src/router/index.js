@@ -31,6 +31,16 @@ export default function (/* { store, ssrContext } */) {
         children: routes
       },
       {
+        path: '/Login',
+        name: '登录',
+        component: () => import('pages/Login.vue'),
+        meta: {
+          title: '登录',
+          icon: '',
+          role: []
+        }
+      },
+      {
         path: '*',
         component: () => import('pages/Error404.vue')
       }
